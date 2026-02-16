@@ -65,10 +65,13 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Student::class);
     }
 
-    public function getAllPermissions()
-    {
-        return optional($this->role->permissions) ->pluck('name')->toArray() ?? [];
+   public function getAllPermissions()
+{
+    if ($this->role) {
+        return $this->role->permissions()->pluck('name')->toArray();
     }
+    return [];
+}
 
     public function hasPermission($permission)
     {

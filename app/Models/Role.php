@@ -12,10 +12,10 @@ class Role extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'hierarchy_level', 'permissions'];
+    protected $fillable = ['name', 'hierarchy_level', 'permissions_json'];
 
     protected $casts = [
-        'permissions' => 'array'
+        'permissions_json' => 'array'
     ];
 
     public function users()

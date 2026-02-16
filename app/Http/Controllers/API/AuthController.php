@@ -47,8 +47,8 @@ class AuthController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone' => $request->phone,
-            'date_of_birth' => $request->date_of_birth,
-            'gender' => $request->gender,
+            'date_of_birth' => $request->date_of_birth
+
         ]);
 
         // Create specific role-based record

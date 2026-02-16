@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -48,8 +47,11 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'view_audit_logs', 'group' => 'system'],
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::create($permission);
+        foreach ($permissions as $perm) {
+            Permission::firstOrCreate(
+                ['name' => $perm['name']],
+                ['group' => $perm['group']]
+            );
         }
 
         // Create Roles with Hierarchy
@@ -97,23 +99,25 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($roles as $roleData) {
-            $role = Role::create([
-                'name' => $roleData['name'],
-                'hierarchy_level' => $roleData['hierarchy_level']
-            ]);
+            $role = Role::firstOrCreate(
+                ['name' => $roleData['name']],
+                ['hierarchy_level' => $roleData['hierarchy_level']]
+            );
 
-            // Assign all permissions to superadmin
+            // Assign all permissions to superadmin using sync (avoids duplicates)
             if ($roleData['name'] === 'superadmin') {
-                $role->permissions()->attach(Permission::all()->pluck('id'));
+                $role->permissions()->sync(Permission::all()->pluck('id'));
             }
         }
 
-        // Create Super Admin User
-        $superAdmin = \App\Models\User::create([
-            'username' => 'superadmin',
-            'email' => 'superadmin@school.edu',
-            'password' => bcrypt('Admin@123'),
-            'role_id' => Role::where('name', 'superadmin')->first()->id,
-        ]);
+        // Create Super Admin User – use firstOrCreate to avoid duplicates
+        \App\Models\User::firstOrCreate(
+            ['email' => 'superadmin@school.edu'],
+            [
+                'username' => 'superadmin',
+                'password' => bcrypt('Admin@123'),
+                'role_id' => Role::where('name', 'superadmin')->first()->id,
+            ]
+        );
     }
 }
